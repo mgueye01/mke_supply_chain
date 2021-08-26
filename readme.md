@@ -47,19 +47,19 @@ The following abbreviations are used in this document:
 ## <a name="introduction"></a> Introduction
 This workshop is designed to demonstrate the power of Docker Secrets, Image Promotion, Scanning Engine, and Content Trust. We will walk through creating a few secrets. Deploying a stack that uses the secret. Then we will create a Mirantis Secure Registry repository where we can create a promotion policy. The promotion policy leverages the output from Image Scanning result. This is the foundation of creating a Secure Supply Chain. 
 
-## <a name="task2"></a>Task 2: Enable Docker Image Scanning
+## <a name="task2"></a>Task 1: Enable Docker Image Scanning
 Before we create the repositories, let's start with enabling the Docker Image Scanning engine.
 
-2.  Navigate to `System`on the left pane, then `Security`.
+1.  Navigate to `System`on the left pane, then `Security`.
 ![](img/system_scanning.jpg)
 
-3.  Select `Enable Scanning`. Leave it in `Online` mode and select `Enable`. Press the button `Enable Online Scanning`. The CVE database will start downloading. This can take a few minutes. Please be patient for it to complete.
+2.  Select `Enable Scanning`. Leave it in `Online` mode and select `Enable`. Press the button `Enable Online Scanning`. The CVE database will start downloading. This can take a few minutes. Please be patient for it to complete.
 ![](img/scanning_enable.jpg)
 
-## <a name="task3"></a>Task 3: Create Jenkins User and Organization
+## <a name="task3"></a>Task 2: Create Jenkins User and Organization
 In order to setup our automation we need to create an organization and a user account for Jenkins. We are going to create a user named `jenkins` in the organization `ci`.
 
-### <a name="task3.1"></a>Task 3.1: Create Jenkins Organization
+### <a name="task3.1"></a>Task 2.1: Create Jenkins Organization
 1. On `MSR`.
 
 ![](img/orgs_1.jpg)
@@ -74,7 +74,7 @@ Now we should see the organization named `ci`.
 
 ![](img/orgs_2.jpg)
 
-### <a name="task3.2"></a>Task 3.2: Create Jenkins User
+### <a name="task3.2"></a>Task 2.2: Create Jenkins User
 While remaining in MSR we can create the user from here.
 
 1. Click on the organization `ci`.
@@ -87,7 +87,7 @@ Now change the permissions for the `jenkins` account to `Org Owner`.
 
 ![](img/org_admin.jpg)
 
-### <a name="task3.3"></a>Task 3.3: Create Jenkins MSR Token
+### <a name="task3.3"></a>Task 2.3: Create Jenkins MSR Token
 Now that we have the `jenkins` user created we need to add a token for use with MSR's API.
 
 Navigate to `Users` on the left pane. Click on `jenkins`, then click the `Access Tokens` tab.
@@ -108,7 +108,7 @@ Lets add it to the `worker3` environment. Replace `<TOKEN>` with the token from 
 export MSR_TOKEN=<TOKEN>
 ```
 
-## <a name="task4"></a>Task 4: Create MSR Repository
+## <a name="task4"></a>Task 3: Create MSR Repository
 We now need to access Mirantis Secure Registry to setup two repositories.
 
 We have an easy way with a script or the hard way by using the GUI.
@@ -176,7 +176,7 @@ curl -X POST -k -L \
 5. We should have two repositories now.
     ![](img/repo_list.jpg)
 
-### <a name="task4.1"></a>Task 4.1: Create Promotion Policy - Private to Public
+### <a name="task4.1"></a>Task 3.1: Create Promotion Policy - Private to Public
 With the two repositories setup we can now define the promotion policy. The first policy we are going to create is for promoting an image that has passed a scan with zero (0) **Critical** vulnerabilities. The policy will target the `ci`/`dc_18` repository.
 
 1. Navigate to the `ci`/`dc18_build` repository. Click `Promotions` and click `New promotion policy`. Note: Make sure the `Is source` box is
@@ -189,7 +189,7 @@ selected.
 
 When we push an image to `ci`/`dc18_build` it will get scanned. Based on that scan report we could see the image moved to `ci`/`dc18`. Lets push a few images to see if it worked.
 
-## <a name="task5"></a>Task 5: Pull / Tag / Push Docker Image
+## <a name="task5"></a>Task 4: Pull / Tag / Push Docker Image
 Lets pull, tag, and push a few images to YOUR MSR.
 
 
@@ -222,7 +222,7 @@ Lets pull, tag, and push a few images to YOUR MSR.
 
 	```
 
-## <a name="task6"></a>Task 6: Review Scan Results
+## <a name="task6"></a>Task 5: Review Scan Results
 Lets take a good look at the scan results from the images. Please keep in mind this will take a few minutes to complete.
 
 1. Navigate to MSR --> `Repostories` --> `ci/dc18_build` --> `Images`.
@@ -249,7 +249,7 @@ Lets take a good look at the scan results from the images. Please keep in mind t
 
     Now that we know what is in the image. We should probably act upon it.
 
-### <a name="task6.1"></a>Task 6.1: Hide Vulnerabilities
+### <a name="task6.1"></a>Task 5.1: Hide Vulnerabilities
 If we find that they CVE is a false positive. Meaning that it might be disputed, or from OS that you are not using. If this is the case we can simply `hide` the vulnerability. This will not remove the fact that the CVE was found.
 
 Click `hide` for the one critical CVE.
@@ -260,7 +260,7 @@ If we click back to `Images` we can now see that the image does not have a criti
 
 Once we have hidden some CVEs we might want to perform a manual promotion of the image.
 
-### <a name="task6.2"></a>Task 6.2: Manually Promote Image
+### <a name="task6.2"></a>Task 5.2: Manually Promote Image
 Manual promotions are useful for those times that you need to move an image from a `Private` repository to a `Public` one. To perform a manual promotion :
 
 1. Click on an image's details. Lets go back to `0.2`, now click `Promote`. Lets `Promote` the image to `ci`/`dc18` with a tag of `promoted`.
@@ -276,7 +276,7 @@ Manual promotions are useful for those times that you need to move an image from
 
       Now that we use automated and manual promotions. Maybe we can extend promoting images beyond MSR.
 
-## <a name="task7"></a>Task 7: Extend with Image Mirroring
+## <a name="task7"></a>Task 6: Extend with Image Mirroring
 Mirantis Secure Registry allows you to create mirroring policies for a repository. When an image gets pushed to a repository and meets a certain criteria, MSR automatically pushes it to repository in another MSR deployment or Docker Hub.
 
 This not only allows you to mirror images but also allows you to create image promotion pipelines that span multiple MSR deployments and datacenters. Let's set one up. How about we mirror an image to [hub.docker.com](https://hub.docker.com)?
@@ -300,7 +300,7 @@ Since we already had an image that had the tag `promoted` we should see that the
 
 ![](img/mirror3.jpg)
 
-## <a name="task8"></a>Task 8: Docker Content Trust / Image Signing
+## <a name="task8"></a>Task 7: Docker Content Trust / Image Signing
 Docker Content Trust/Notary provides a cryptographic signature for each image. The signature provides security so that the image requested is the image you get. Read [Notary's Architecture](https://docs.docker.com/notary/service_architecture/) to learn more about how Notary is secure. Since Mirantis platform is "Secure by Default," Mirantis Secure Registry comes with the Notary server out of the box.
 
 We can create policy enforcement within Universal Control Plane (MKE) such that **ONLY** signed images from the `ci` team will be allowed to run. Since this workshop is about MSR and Secure Supply Chain we will skip that step.
@@ -450,10 +450,10 @@ Administrative keys for $MSR_URL/ci/dc18
 
 	For example, use the command `cat ~/.docker/trust/tuf/$MSR_URL/ci/dc18/metadata/targets.json | jq '.signed.delegations.keys' | grep public` to extract the certificate.
 
-## <a name="task9"></a>Task 9: Automate with Jenkins
+## <a name="task9"></a>Task 8: Automate with Jenkins
 In order to automate we need to deploy Jenkins. If you want I can point you to a few Docker Compose yamls. OR we have the easy way. The easy, aka script, deploys Jenkins quickly.
 
-### <a name="task9.2"></a>Task 9.2: Plumb Jenkins
+### <a name="task9.2"></a>Task 8.2: Plumb Jenkins
 Now that we have Jenkins setup and running we need to add 3 additional plugins - Blue Ocean, Generic Webhook Trigger and Piepline:
 
 1. Click on `Manage Jenkins` --> `Manage Plugins` --> `Available` and filter/search for `Blue Ocean`, `Generic Webhook Trigger` and `Pipeline`. When you have found each one check the checkbox to the left of the plugin name to select for installation.
@@ -502,7 +502,7 @@ Now that we have Jenkins setup and running we need to add 3 additional plugins -
 10. Review the `ci`/`dc18` repository in MSR. You should now see a tag that have been promoted.
 	![](img/automated_supply.jpg)
 
-### <a name="task9.3"></a>Task 9.3: Webhooks
+### <a name="task9.3"></a>Task 8.3: Webhooks
 Now that we have Jenkins setup we can extend with webhooks. In Jenkins speak a webhook is simply a build trigger. Let's configure one.
 
 1. Navigate to Jenkins and click on the project/item called `ci_dc18` and click on `Configure` on the left hand side.
@@ -511,7 +511,7 @@ Now that we have Jenkins setup we can extend with webhooks. In Jenkins speak a w
 2. Then scroll down to `Build Triggers`. Check the checkbox for `Generic Webhook Trigger` and enter a Token of `dc18_rocks`.  Scroll down and click `Save`.
 	![](img/jenkins_triggers.jpg)
 
-## <a name="task10"></a>Task 10: Optional Jenkins Pipeline, MSR WebHook and Content Trust
+## <a name="task10"></a>Task 9: Optional Jenkins Pipeline, MSR WebHook and Content Trust
 This optional task is to implement the following Jenkins Declarative Pipelines and MSR logic to achieve the following:
 
  - retag the image
@@ -522,7 +522,7 @@ This optional task is to implement the following Jenkins Declarative Pipelines a
  - pull the image
  - use the `docker trust` command to sign and push the image back into MSR
 
-### <a name="task10.1"></a>Task 10.1: Create credentials in Jenkins for Trust
+### <a name="task10.1"></a>Task 9.1: Create credentials in Jenkins for Trust
 As we are now looking to sign images from our Jenkins instance we need access to the signing keys that were created when [Task 8: Docker Content Trust / Image Signing ](#task8) was performed.
 
 1. Navigate back to the PWD tab in your browser.
@@ -563,7 +563,7 @@ As we are now looking to sign images from our Jenkins instance we need access to
 
 8. Press the `OK` button.
 
-### <a name="task10.1"></a>Task 10.2: Create Pipeline Jobs
+### <a name="task10.1"></a>Task 9.2: Create Pipeline Jobs
 1. From the Jenkins homepage Create a new Pipeline job called `ci_dc18_pipeline`. Copy and paste the below pipeline script into the Pipeline Script window at the end of the job:
 
 	```
@@ -744,7 +744,7 @@ As we are now looking to sign images from our Jenkins instance we need access to
 
 3. In the pipeline job `ci_dc18_pipeline_sign` we are making use of the `JsonSlurperClassic` object which requires a script approval. Therefore we need to run this pipeline job outside of the `Groovy Sandbox`. Make sure to uncheck the box `Use Groovy Sandbox` below the Pipeline Script window. Save the job
 
-### <a name="task10.3"></a>Task 10.3: Create MSR WebHook
+### <a name="task10.3"></a>Task 9.3: Create MSR WebHook
 Now that we have our Jeknins pipeline jobs created we need to create a webhook in MSR so that we can trigger the signing job after the image has been promoted.
 
 1. Navigate to MSR --> `Repostories` --> `ci/dc18_build` --> `Webhooks`.
@@ -759,7 +759,7 @@ Now that we have our Jeknins pipeline jobs created we need to create a webhook i
 
 5. Press the `Create` button
 
-### <a name="task10.4"></a>Task 10.4: Run the jobs!
+### <a name="task10.4"></a>Task 9.4: Run the jobs!
 Now all the Jenkins and MSR setup has been done you can manually run the Jenkins job `ci_dc18_pipeline`. This will cause the alpine image to be retagged and pushed to MSR. MSR will then scan the image and if there are 0 critical vulnerabilities it will promote the image into `ci/dc18`. The webhook will then trigger and the 2nd Jenkins job `ci_dc18_pipeline_sign` will start which will retag the image and then use the `docker trust` command to sign the image and push it back into MSR.
 
 ## <a name="Conclusion"></a>Conclusion
