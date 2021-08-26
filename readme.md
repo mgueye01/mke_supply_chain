@@ -1,3 +1,5 @@
+This workshop was originally created by https://github.com/clemenko/dc18_supply_chain
+
 # Secure, Automated Software Supply Chain
 
 In this lab you will integrate Mirantis Cloud Native Platform in to your development pipeline. You will build your application from a Dockerfile and push your image to the Mirantis Secure Registry (MSR). MSR will scan your image for vulnerabilities so they can be fixed before your application is deployed. This helps you build more secure apps!
